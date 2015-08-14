@@ -1,0 +1,69 @@
+html, body {
+    font: 15px Courier;
+    padding: 0px;
+    margin: 0px;
+}
+
+body {
+    overflow-x: true;
+    overflow-y: true;
+}
+
+.hex-byte {
+    margin-left: 0px;
+    margin-right: 0px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.hex-byte.small-margin-left {
+    padding-left: 10px;
+}
+
+.hex-byte.large-margin-left {
+    padding-left: 30px;
+}
+
+.hex-offset {
+    margin-right: 25px;
+    display: inline-block;
+    vertical-align: top;
+    background-color: lightgrey;
+    padding-top: 5px;
+}
+
+.hex-dump {
+    display: inline-block;
+    vertical-align: top;
+    padding-top: 5px;
+}
+
+.hex-strings {
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 50px;
+    padding-top: 5px;
+}
+
+.hex-view {
+    min-width: 1000px;
+}
+
+.hex-dump-line, .hex-offset-line, .hex-strings-line {
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+
+.hidden {
+    width: 0px;
+}
+
+span.hex-byte.deleted {
+    background-color: rgba(255, 0, 0, 0.5);
+}
+
+span.hex-byte.created {
+    background-color: rgba(0, 128, 0, 0.5);
+}
+
