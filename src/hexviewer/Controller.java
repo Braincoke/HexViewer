@@ -24,7 +24,7 @@ public class Controller implements Initializable {
         String file1 = "File1.txt";
         File file = new File(file1);
         File reference = new File("reference.pdf");
-        File compared = new File("compared.pdf");
+        File compared = new File("inserted4Bytes.pdf");
         //browser.loadFile(reference, 0);
         browser.loadDiff(reference,compared,0);
     }
