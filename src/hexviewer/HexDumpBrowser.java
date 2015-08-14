@@ -12,17 +12,11 @@ public class HexDumpBrowser extends HexBrowser {
 
     public HexDumpBrowser(){
         super();
-        linesPerPage = DEFAULT_LINE_NUMBER_PER_PAGE;
-        this.toolBar = initToolBar();
-        this.webView = new HexDumpWebView();
-        VBox vBox = new VBox(toolBar, webView);
-        VBox.setVgrow(webView, Priority.ALWAYS);
-        this.getChildren().add(vBox);
-        setRightAnchor(vBox, 0d);
-        setBottomAnchor(vBox, 0d);
-        setLeftAnchor(vBox, 0d);
-        setTopAnchor(vBox, 0d);
 
+        /* Master pane */
+        this.webView = new HexDumpWebView();
+        this.masterDetailPane.setMasterNode(webView);
+        masterDetailPane.setDividerPosition(0.2);
         //CTRL + SCROLL WHEEL TO ZOOM IN OR OUT
         webView.getWebView().setOnScroll(event -> {
             if (event.isControlDown()) {

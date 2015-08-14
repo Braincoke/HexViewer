@@ -1,9 +1,10 @@
 <?import hexviewer.HexDiffBrowser?>
 <?import javafx.scene.layout.*?>
+<?import hexviewer.HexDumpBrowser?>
 <AnchorPane fx:controller="hexviewer.Controller"
           xmlns:fx="http://javafx.com/fxml"
             fx:id="anchorPane">
-            <HexDiffBrowser fx:id="browser"
+            <HexDumpBrowser fx:id="browser"
                             prefWidth="900"
                     AnchorPane.bottomAnchor="0"
                     AnchorPane.leftAnchor="0"

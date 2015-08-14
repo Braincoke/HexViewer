@@ -17,7 +17,7 @@ public class Controller implements Initializable {
     @FXML
     private HexDumpWebView hexDumpWebView;
     @FXML
-    private HexDiffBrowser browser;
+    private HexDumpBrowser browser;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -25,7 +25,8 @@ public class Controller implements Initializable {
         File file = new File(file1);
         File reference = new File("reference.pdf");
         File compared = new File("compared.pdf");
-        browser.loadDiff(reference,compared,0);
+        browser.loadFile(reference, 0);
+        //browser.loadDiff(reference,compared,0);
     }
 
     private String getHexDump(List<HexDumpLine> lines){

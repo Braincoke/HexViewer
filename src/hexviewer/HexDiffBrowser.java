@@ -2,7 +2,6 @@ package hexviewer;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -14,14 +13,12 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import org.omg.PortableInterceptor.SUCCESSFUL;
 import utils.HexDiff;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 /**
  * A simple interface to browse the hex dump of a file
@@ -174,8 +171,8 @@ public class HexDiffBrowser extends HexBrowser {
     public void setLinesPerPage(int linesPerPage) {
         this.linesPerPage = linesPerPage;
         linesPerPageTextField.setText(String.valueOf(linesPerPage));
-        setPageMax((int) ((offsetMax / (linesPerPage * 32)) + 1));
-        setPage((int) ((offset / (linesPerPage * 32)) + 1));
+        setPageMax(offsetMax);
+        setPage(offset);
         setModifiedPages(hexDiff.getModifiedOffsets());
     }
 
@@ -188,9 +185,7 @@ public class HexDiffBrowser extends HexBrowser {
         modifiedPages.clear();
         SortedSet<Integer> pages = new TreeSet<>();
         for(Long modOffset : modifiedOffsets){
-            double offsetd = (double) modOffset;
-            double bytesPerPage = (double) linesPerPage*BYTES_PER_LINE;
-            int page = (int) (Math.floor(offsetd/bytesPerPage) + 1);
+            int page = offsetToPage(modOffset);
             pages.add(page);
         }
         modifiedPages.setAll(pages);
@@ -206,7 +201,7 @@ public class HexDiffBrowser extends HexBrowser {
         this.modifiedOffsets.clear();
         int previousPage = 0;
         for(Long modOffset : modifiedOffsets){
-            int page = (int) (Math.floorDiv(modOffset,linesPerPage*BYTES_PER_LINE) + 1);
+            int page = offsetToPage(modOffset);
             if(page!=previousPage){
                 this.modifiedOffsets.add(String.format("%06X", modOffset));
             }
@@ -302,7 +297,7 @@ public class HexDiffBrowser extends HexBrowser {
                 this.setOnMouseClicked(event -> {
                     if(event.getClickCount()>=2){
                         long offset = Long.parseLong(item, 16);
-                        int page = (int) (( offset / (linesPerPage*BYTES_PER_LINE) ) + 1);
+                        int page = offsetToPage(offset);
                         gotoPage(page);
                     }
                 });

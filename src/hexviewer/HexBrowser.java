@@ -47,7 +47,7 @@ public abstract class HexBrowser extends AnchorPane {
     }
 
     protected void setOffset(long offset) {
-        setPage((int) ((offset/(linesPerPage*BYTES_PER_LINE))+1));
+        setPage(offset);
         this.offset = offset;
     }
 
@@ -65,8 +65,8 @@ public abstract class HexBrowser extends AnchorPane {
     public void setLinesPerPage(int linesPerPage) {
         this.linesPerPage = linesPerPage;
         linesPerPageTextField.setText(String.valueOf(linesPerPage));
-        setPageMax((int) ((offsetMax / (linesPerPage * BYTES_PER_LINE)) + 1));
-        setPage((int) ((offset / (linesPerPage * BYTES_PER_LINE)) + 1));
+        setPageMax(offsetMax);
+        setPage(offset);
     }
 
     /**
@@ -85,6 +85,11 @@ public abstract class HexBrowser extends AnchorPane {
         this.page = page;
     }
 
+    protected void setPage(long offset){
+        this.page = offsetToPage(offset);
+        this.currentPageLabel.setText(String.valueOf(page));
+    }
+
     /**
      * The last offset we can go to according
      * the file(s) length
@@ -97,7 +102,7 @@ public abstract class HexBrowser extends AnchorPane {
 
     protected void setOffsetMax(long offsetMax) {
         this.offsetMax = offsetMax;
-        setPageMax((int) (( offsetMax/ (linesPerPage*BYTES_PER_LINE) ) + 1));
+        setPageMax(offsetToPage(offsetMax));
     }
 
     /**
@@ -113,6 +118,26 @@ public abstract class HexBrowser extends AnchorPane {
         this.pageMax = pageMax;
         this.pageMaxLabel.setText(" / " + String.valueOf(pageMax));
     }
+
+    protected void setPageMax(long offsetMax){
+        this.pageMax = offsetToPage(offsetMax);
+        this.pageMaxLabel.setText(" / " + String.valueOf(pageMax));
+    }
+
+    /**
+     * Converts an offset to a page
+     */
+    protected int offsetToPage(long offset){
+        return (int) (( Math.floorDiv(offset,(linesPerPage*BYTES_PER_LINE) ) + 1));
+    }
+
+    /**
+     * Converts a page to an offset
+     */
+    protected long pageToOffset(int page){
+        return (page-1)*linesPerPage*BYTES_PER_LINE;
+    }
+
 
     /**
      * Loading indicator
