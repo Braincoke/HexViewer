@@ -137,11 +137,11 @@ public class HexDump {
      * @param byteNumber    The number of bytes to read
      * @return              The hex dump of the bytes read
      */
-    public static String getHexDump(File file, long offset, int byteNumber) throws IOException {
+    public static String getHexDump(File file, long offset, long byteNumber) throws IOException {
         StringBuilder hexDump = new StringBuilder();
         InputStream is = new FileInputStream(file);
         long skipped = is.skip(offset);
-        int remaining = byteNumber;
+        long remaining = byteNumber;
 
         while (is.available()>0 && remaining>0){
             int value = is.read();

@@ -1,0 +1,62 @@
+
+Inserted 
+-------------------------------------------------------------------------------
+
+inserted.pdf
+  Offset: 59 - Added 4 bytes - Bytes: 41 41 41 41
+  Tested OK
+
+inserted1.pdf
+  Offset: 59 - Added 4 bytes - Bytes: 41 41 41 41
+  Offset: 3919A - Added 4 bytes - Bytes : 41 41 41 41
+  Tested OK
+
+inserted2.pdf
+  Offset: 59 - Added 4 bytes - Bytes: 41 41 41 41
+  Offset: 3919A - Added 4 bytes - Bytes : 41 41 41 41
+  Offset: 4AB10- Added 4 bytes - Bytes : 41 41 41 41
+  Tested OK
+
+
+
+Deleted
+--------------------------------------------------------------------------------
+
+deleted.pdf
+  Offset: 59 - Deleted 4 bytes - Bytes : 2F 4D 61 72
+	Tested OK
+
+deleted1.pdf
+  Offset: 59 - Deleted 4 bytes - Bytes : 2F 4D 61 72
+  Offset: 232D0 (new offset)- Deleted 4 bytes - Bytes : 63 49 63 31
+	Tested OK
+
+
+deleted2.pdf
+  Offset: 59 - Deleted 4 bytes - Bytes : 2F 4D 61 72
+  Offset: 232D0 (new offset)- Deleted 4 bytes - Bytes : 63 49 63 31
+  Offset: 461E7 (new offset)- Deleted 4 bytes - Bytes : 8C A6 3C 55
+
+
+
+Modified
+--------------------------------------------------------------------------------
+New bytes = 41 41 41 41
+
+modified.pdf
+   Offset:   666  - Modified 4 bytes - Old bytes : 1B 40 44 D7
+
+
+modified1.pdf
+   Offset:   666  - Modified 4 bytes - Old bytes : 1B 40 44 D7
+   Offset: 2FBF7  - Modified 4 bytes - Old bytes : 5A 05 F7 70
+
+
+
+modified2.pdf
+   Offset:   666  - Modified 4 bytes - Old bytes : 1B 40 44 D7
+   Offset: 2FBF7  - Modified 4 bytes - Old bytes : 5A 05 F7 70
+   Offset: 49DE8  - Modified 4 bytes - Old bytes : 30 30 30 30
+
+Tested Ok for all except for one strange error for modified.pdf (and the error expanded to the other files) where only the
+last 3 bytes were considered modified
