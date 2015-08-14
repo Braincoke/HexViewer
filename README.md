@@ -1,7 +1,8 @@
 # HexViewer
 A JavaFX application to view hex dumps and hex diffs
 
-This JavaFX application can be used as a module in another application to view hex dumps or hex diffs. 
+This JavaFX application can be used as a module in another application to generate and view hexadecimal dumps or
+generate and view the differences between two hexadecimal dumps.
 
 ## Dependencies
 
@@ -18,3 +19,4 @@ You can use the classes HexDiffBrowser or HexDumpBrowser that provides a full en
     File reference = new File("reference.pdf");
     File compared = new File("compared.pdf");
     browser.loadDiff(reference, compared, 0);
+

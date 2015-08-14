@@ -357,7 +357,7 @@ public class HexDiff {
         private void generateFullDiff() throws IOException {
             //To be able to handle big files we will cut the diff generation in portions of 1MB
             int MB = 1024*1024;
-            int KB = 10*1024;
+            int KB = 100*1024;
             long offsetMax = Math.max(reference.length(), compared.length());
             updateProgress(0, offsetMax);
             for(long offset = 0; offset<offsetMax; offset+=KB){

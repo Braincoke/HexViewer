@@ -4,7 +4,7 @@
 <AnchorPane fx:controller="hexviewer.Controller"
           xmlns:fx="http://javafx.com/fxml"
             fx:id="anchorPane">
-            <HexDumpBrowser fx:id="browser"
+            <HexDiffBrowser fx:id="browser"
                             prefWidth="900"
                     AnchorPane.bottomAnchor="0"
                     AnchorPane.leftAnchor="0"
