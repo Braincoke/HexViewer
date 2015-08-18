@@ -233,6 +233,11 @@ public abstract class HexBrowser extends AnchorPane {
         zoomOutBtn.setIcon("SEARCH_MINUS");
         toolBar.getItems().addAll(zoomOutBtn, zoomInBtn);
 
+        //Reload button
+        IconButton reloadBtn = new IconButton();
+        reloadBtn.setIcon("REFRESH");
+        toolBar.getItems().add(reloadBtn);
+
         //Hamburger
         IconButton hamburgerBtn = new IconButton();
         hamburgerBtn.setIcon("BARS");
@@ -256,6 +261,7 @@ public abstract class HexBrowser extends AnchorPane {
         });
         zoomInBtn.setOnAction(event -> zoomIn());
         zoomOutBtn.setOnAction(event -> zoomOut());
+        reloadBtn.setOnAction(event -> reloadWebView());
         hamburgerBtn.setOnAction(event -> toggleDetailPane());
         return toolBar;
     }
@@ -357,5 +363,8 @@ public abstract class HexBrowser extends AnchorPane {
      */
     protected abstract void zoomOut();
 
+    /**
+     * Refresh the view
+     */
 
 }

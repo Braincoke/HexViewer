@@ -8,7 +8,6 @@ import utils.ByteDiff;
 import utils.HexDiff;
 import utils.HexDump;
 
-import java.io.File;
 import java.util.LinkedList;
 
 /**
@@ -157,7 +156,7 @@ public class HexDiffWebView extends StackPane {
         int nbLines = diff.getNbLines();
         long offsetMax = nbLines * HexDump.BYTES_PER_LINE +offset;
         StringBuilder offsetDiv = new StringBuilder("\t<div id=\"hexOffset\" class=\"hex-offset\">\n");
-        for(long i= offset; i<offsetMax ; i+=HexDump.BYTES_PER_LINE){
+        for(long i= offset; i<offsetMax ; i+= HexDump.BYTES_PER_LINE){
             offsetDiv.append("\t\t<div class=\"hex-offset-line\">\n\t");
             offsetDiv.append(String.format("%06X",i));
             offsetDiv.append("\n\t\t</div>\n");

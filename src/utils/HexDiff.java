@@ -2,27 +2,26 @@ package utils;
 
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
+import javafx.concurrent.Worker;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Generates a hex diff of two files
  */
 public class HexDiff {
 
-    /**
-     * Compare the hex dumps of two files
-     * @param reference     the file used as a base in the comparison
-     * @param compared      the compared file
-     *
-     */
-    public  HexDiff(File reference, File compared){
-        this.reference = reference;
-        this.compared = compared;
+    public HexDiff(){
+        this.windowSize = 100;
+        this.windowSizeUnit = 1024;
+        this.windowStep = 50;
+        this.windowStepUnit = 1024;
         this.refDiff = new TreeMap<>();
         this.comDiff = new TreeMap<>();
         this.oldBytes = new LinkedList<>();
@@ -31,6 +30,25 @@ public class HexDiff {
         this.diffComputed = false;
         this.diffGenerator = new DiffService();
     }
+
+
+    /**
+     * Initialise with files
+     * @param reference     the file used as a base in the comparison
+     * @param compared      the compared file
+     *
+     */
+    public  HexDiff(File reference, File compared){
+        this();
+        this.reference = reference;
+        this.compared = compared;
+    }
+
+    /*******************************************************************************************************************
+     *                                                                                                                 *
+     * DIFF PARAMETERS                                                                                                 *
+     *                                                                                                                 *
+     ******************************************************************************************************************/
 
     /**
      * The file used as a reference in the diff
@@ -42,7 +60,12 @@ public class HexDiff {
     }
 
     public void setReference(File reference) {
-        if(this.reference.compareTo(reference) != 0) {
+        if(this.reference!=null) {
+            if (this.reference.compareTo(reference) != 0) {
+                this.reference = reference;
+                this.diffComputed = false;
+            }
+        } else {
             this.reference = reference;
             this.diffComputed = false;
         }
@@ -58,23 +81,24 @@ public class HexDiff {
     }
 
     public void setCompared(File compared) {
-        if(this.compared.compareTo(compared) != 0) {
+        if(this.compared != null) {
+            if (this.compared.compareTo(compared) != 0) {
+                this.compared = compared;
+                this.diffComputed = false;
+            }
+        } else {
             this.compared = compared;
             this.diffComputed = false;
         }
     }
 
     /**
-     * The list of modified offsets in the reference file
-     * Operations listed are : EQUAL, DELETED
+     * Set both file
      */
-    private SortedMap<Long, DiffUtils.Operation> refDiff;
-
-    /**
-     * The list of modified offsets in the compared file
-     * Operations listed are : EQUAL, INSERTED
-     */
-    private SortedMap<Long, DiffUtils.Operation> comDiff;
+    public void setFiles(File reference, File compared){
+        setReference(reference);
+        setCompared(compared);
+    }
 
     /**
      * The starting point of the line
@@ -98,6 +122,150 @@ public class HexDiff {
     public int getNbLines() {
         return nbLines;
     }
+
+    /**
+     * The size of the sliding window for the diff generation
+     */
+    private long windowSize;
+
+    public long getWindowSize() {
+        return windowSize;
+    }
+
+    public void setWindowSize(long windowSize) {
+        this.windowSize = windowSize;
+    }
+
+
+    /**
+     * The unit of the window size (B, KB, MB)
+     */
+    private long windowSizeUnit;
+
+    public long getWindowSizeUnit() {
+        return windowSizeUnit;
+    }
+
+    /**
+     * Set the window size unit using the number of bytes in the unit (B = 1byte, KB = 1024 byte ...)
+     * @param windowSizeUnit    The number of bytes in the unit
+     */
+    public void setWindowSizeUnit(long windowSizeUnit) {
+        this.windowSizeUnit = windowSizeUnit;
+    }
+
+    /**
+     * Set the window size unit using human readable unit (B for byte, KB for kilobyte, MB for megabyte)
+     * @param windowSizeUnit    The human readable unit
+     */
+    public void setWindowSizeUnit(String windowSizeUnit) {
+        switch (windowSizeUnit){
+            case "B":
+                this.windowSizeUnit = 1;
+                break;
+            case "KB":
+                this.windowSizeUnit = 1024;
+                break;
+            case "MB":
+                this.windowSizeUnit = 1024*1024;
+                break;
+            default:
+                this.windowSizeUnit = 1024;
+        }
+    }
+
+
+    /**
+     * The number of offset to skip when sliding the window
+     */
+    private long windowStep;
+
+    public long getWindowStep() {
+        return windowStep;
+    }
+
+    public void setWindowStep(long windowStep) {
+        this.windowStep = windowStep;
+    }
+
+    public String getFormattedWindowSizeUnit() {
+        String formatted;
+        if(windowSizeUnit == 1){
+            formatted = "B";
+        } else if (windowSizeUnit == 1024){
+            formatted = "KB";
+        } else if (windowSizeUnit == 1024*1024){
+            formatted = "MB";
+        } else {
+            formatted = "?";
+        }
+        return  formatted;
+    }
+
+    /**
+     * The unit of the window step
+     */
+    private long windowStepUnit;
+
+    public long getWindowStepUnit() {
+        return windowStepUnit;
+    }
+
+    public void setWindowStepUnit(long windowStepUnit) {
+        this.windowStepUnit = windowStepUnit;
+    }
+
+    /**
+     * Set the window step unit using human readable unit (B for byte, KB for kilobyte, MB for megabyte)
+     * @param windowStepUnit    The human readable unit
+     */
+    public void setWindowStepUnit(String windowStepUnit) {
+        switch (windowStepUnit){
+            case "B":
+                this.windowStepUnit = 1;
+                break;
+            case "KB":
+                this.windowStepUnit = 1024;
+                break;
+            case "MB":
+                this.windowStepUnit = 1024*1024;
+                break;
+            default:
+                this.windowStepUnit = 1024;
+        }
+    }
+    public String getFormattedWindowStepUnit() {
+        String formatted;
+        if(windowStepUnit == 1){
+            formatted = "B";
+        } else if (windowStepUnit == 1024){
+            formatted = "KB";
+        } else if (windowStepUnit == 1024*1024){
+            formatted = "MB";
+        } else {
+            formatted = "?";
+        }
+        return  formatted;
+    }
+
+
+    /*******************************************************************************************************************
+     *                                                                                                                 *
+     * GENERATED DIFF                                                                                                  *
+     *                                                                                                                 *
+     ******************************************************************************************************************/
+
+    /**
+     * The list of modified offsets in the reference file
+     * Operations listed are : EQUAL, DELETED
+     */
+    private SortedMap<Long, DiffUtils.Operation> refDiff;
+
+    /**
+     * The list of modified offsets in the compared file
+     * Operations listed are : EQUAL, INSERTED
+     */
+    private SortedMap<Long, DiffUtils.Operation> comDiff;
 
     /**
      * The bytes of the old version, with their state
@@ -153,6 +321,14 @@ public class HexDiff {
      */
     private boolean diffComputed;
 
+    public boolean isDiffComputed() {
+        return diffComputed;
+    }
+
+    public void setDiffComputed(boolean diffComputed) {
+        this.diffComputed = diffComputed;
+    }
+
     /*******************************************************************************************************************
      *                                                                                                                 *
      * DIFF GENERATION                                                                                                 *
@@ -183,6 +359,25 @@ public class HexDiff {
     }
 
     /**
+     * Generate the diff if it hasn't been done yet and update the attributes storing the bytes and strings.
+     * Allows customizing the window size and window step
+     * @param offset            the starting point for reading the files
+     * @param nbLines           the number of hex lines to read. A line is 16 bytes.
+     * @param windowSize        the size of the sliding window
+     * @param windowSizeUnit    the unit of the sliding window size
+     * @param windowStep        the number of offsets skipped when sliding the window
+     * @throws IOException
+     */
+    public void loadDiff(long offset, int nbLines, int windowSize, String windowSizeUnit, int windowStep) throws IOException {
+        setOffset(offset);
+        setWindowSize(windowSize);
+        setWindowSizeUnit(windowSizeUnit);
+        setWindowStep(windowStep);
+        loadDiff(offset, nbLines);
+    }
+
+
+    /**
      * Generate the diff if it hasn't been done yet and update the attributes storing the bytes and strings
      * @param offset        the starting point for reading the files
      * @param nbLines       the number of hex lines to read. A line is 16 bytes.
@@ -193,12 +388,14 @@ public class HexDiff {
         oldBytes = new LinkedList<>();
         newBytes = new LinkedList<>();
         if(!diffComputed) {
+            modifiedOffsets = new TreeSet<>();
             diffGenerator.setOnSucceeded(event -> {
                 try {
                     updateDiff(offset, nbLines);
                 } catch (IOException ignored) {
                 }
             });
+            diffGenerator.reset();
             diffGenerator.start();
         } else {
             updateDiff(offset, nbLines);
@@ -323,6 +520,7 @@ public class HexDiff {
                 .forEach(modifiedOffsets::remove);
     }
 
+
     /**
      * This service is responsible for generating the diff of two files.
      * It must be run in a JavaFX application since it extends Service.
@@ -341,10 +539,15 @@ public class HexDiff {
      */
     private class DiffGeneratorTask extends Task<Void> {
 
+        /**
+         * First offset of the window
+         */
+        private long windowStart;
 
-        private long chunkStart;
-
-        private long chunkEnd;
+        /**
+         * Last offset of the window
+         */
+        private long windowEnd;
 
         /**
          * The number of bytes associated to the current operation
@@ -355,10 +558,9 @@ public class HexDiff {
 
         private long offsetMax;
 
-        private long diffChunk;
-
         @Override
         protected Void call() throws Exception {
+            //Logger.getLogger(getClass().getName()).log(Level.INFO, "Starting diff generation");
             shift = 0;
             generateFullDiff();
             return null;
@@ -366,9 +568,9 @@ public class HexDiff {
 
         /**
          * Verify that we are not adding noise generated by the chunked diff and update the map accordingly
-         * @param map
-         * @param offsetDiff
-         * @param operationDiff
+         * @param map           Either refDiff or comDiff
+         * @param offsetDiff    The offset to put in the map
+         * @param operationDiff The operation to put in the map
          */
         private void addDiff(SortedMap<Long, DiffUtils.Operation> map,
                              Long offsetDiff,
@@ -380,19 +582,19 @@ public class HexDiff {
              */
             if(shift<0) {
             /* Is it the very first chunk or the very last one? */
-                if (chunkStart == 0) {
+                if (windowStart == 0) {
                 /* Then we add everything as long as it is not an insert going up to the last offset */
                     if (operationDiff == DiffUtils.Operation.INSERT) {
-                        if (offsetDiff + byteCount < chunkEnd) {
+                        if (offsetDiff + byteCount < windowEnd) {
                             addDiff = true;
                         }
                     } else {
                         addDiff = true;
                     }
-                } else if (chunkEnd >= offsetMax) {
+                } else if (windowEnd >= offsetMax) {
                 /* Then we add everything as long as it is not a deletion related to the first offset */
                     if (operationDiff == DiffUtils.Operation.DELETE) {
-                        if (offsetDiff > chunkStart) {
+                        if (offsetDiff > windowStart) {
                             addDiff = true;
                         }
                     } else {
@@ -400,8 +602,8 @@ public class HexDiff {
                     }
                 } else {
                 /* Then we add only the "middle" */
-                    if ((operationDiff == DiffUtils.Operation.INSERT && (offsetDiff + byteCount < chunkEnd))
-                            || (operationDiff == DiffUtils.Operation.DELETE && (offsetDiff > chunkStart))) {
+                    if ((operationDiff == DiffUtils.Operation.INSERT && (offsetDiff + byteCount < windowEnd))
+                            || (operationDiff == DiffUtils.Operation.DELETE && (offsetDiff > windowStart))) {
                         addDiff = true;
                     } else if (operationDiff == DiffUtils.Operation.EQUAL){
                         addDiff = true;
@@ -413,19 +615,19 @@ public class HexDiff {
                  */
 
             /* Is it the very first chunk or the very last one? */
-                if (chunkStart == 0) {
+                if (windowStart == 0) {
                 /* Then we add everything as long as it is not a deletion going up to the last offset */
                     if (operationDiff == DiffUtils.Operation.DELETE) {
-                        if (offsetDiff + byteCount < chunkEnd) {
+                        if (offsetDiff + byteCount < windowEnd) {
                             addDiff = true;
                         }
                     } else {
                         addDiff = true;
                     }
-                } else if (chunkEnd >= offsetMax) {
+                } else if (windowEnd >= offsetMax) {
                 /* Then we add everything as long as it is not an insertion related to the first offset */
                     if (operationDiff == DiffUtils.Operation.INSERT) {
-                        if (offsetDiff > chunkStart) {
+                        if (offsetDiff > windowStart) {
                             addDiff = true;
                         }
                     } else {
@@ -433,8 +635,8 @@ public class HexDiff {
                     }
                 } else {
                 /* Then we add only the "middle" */
-                    if ((operationDiff == DiffUtils.Operation.DELETE && (offsetDiff + byteCount < chunkEnd))
-                            || (operationDiff == DiffUtils.Operation.INSERT && (offsetDiff > chunkStart))) {
+                    if ((operationDiff == DiffUtils.Operation.DELETE && (offsetDiff + byteCount < windowEnd))
+                            || (operationDiff == DiffUtils.Operation.INSERT && (offsetDiff > windowStart))) {
                         addDiff = true;
                     } else if (operationDiff== DiffUtils.Operation.EQUAL){
                         addDiff = true;
@@ -465,21 +667,25 @@ public class HexDiff {
          */
         private void generateFullDiff() throws IOException {
             //To be able to handle big files we will cut the diff generation in portions of x*KB or x*MB
-            int MB = 1024*1024;
-            int KB = 1024;
-            diffChunk = 50*KB;
             offsetMax = Math.max(reference.length(), compared.length());
             updateProgress(0, offsetMax);
-            for(long offset = 0; offset<offsetMax; offset+=(diffChunk/2)){
-                chunkStart = offset;
-                chunkEnd = offset+diffChunk;
-                computeDiff(offset, diffChunk, offsetMax);
+            long currentOffset = 0;
+            while(currentOffset < offsetMax && !isCancelled()){
+                windowStart = currentOffset;
+                windowEnd = currentOffset+ windowSize*windowSizeUnit;
+                computeDiff(currentOffset, windowSize*windowSizeUnit);
+                currentOffset += windowStep*windowStepUnit;
+                updateProgress(currentOffset, offsetMax);
             }
+            if(!isCancelled()) {
             /* Remove redundancies */
-            cleanupMap(refDiff);
-            cleanupMap(comDiff);
-            cleanupSet();
-            diffComputed = true;
+                cleanupMap(refDiff);
+                cleanupMap(comDiff);
+                cleanupSet();
+                diffComputed = true;
+            } else {
+                Logger.getLogger(getClass().getName()).log(Level.INFO, "Diff generation was cancelled");
+            }
         }
 
         /**
@@ -487,7 +693,7 @@ public class HexDiff {
          * @param offset        The starting point of the diff
          * @param byteNumber    The number of byte to read to generate the diff
          */
-        private void computeDiff(long offset, long byteNumber, long offsetMax) throws IOException {
+        private void computeDiff(long offset, long byteNumber) throws IOException {
         /* We need the hex dumps to generate the diff */
             String refDump = HexDump.getHexDump(reference, offset, byteNumber);
             String comDump = HexDump.getHexDump(compared, offset, byteNumber);
@@ -566,7 +772,7 @@ public class HexDiff {
                             break;
                     }
                 }
-                updateProgress((currentOffsetNew+currentOffsetOld)/2, offsetMax);
+//                updateProgress((currentOffsetNew+currentOffsetOld)/2, offsetMax);
             }
         }
     }

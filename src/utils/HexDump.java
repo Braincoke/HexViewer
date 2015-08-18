@@ -1,6 +1,9 @@
 package utils;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
@@ -43,7 +46,7 @@ public class HexDump {
             for(int i=size; i<nbLines; i++) {
                 hexDumpLines.add(new HexDumpLine(ERROR_OFFSET, "..IO.EXCEPTION..", "..IO.EXCEPTION.."));
             }
-            Logger.getLogger(HexDump.class.getName()).log(Level.WARNING, "Error when loading the file : ", e);
+            Logger.getLogger(HexDump.class.getName()).log(Level.WARNING, "Error when loading the file : " + file.getPath(), e);
         }
         return hexDumpLines;
     }

@@ -9,16 +9,16 @@ import javafx.geometry.Orientation;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Paint;
 import utils.HexDiff;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * A simple interface to browse the hex dump of a file
@@ -30,13 +30,19 @@ public class HexDiffBrowser extends HexBrowser {
         super();
 
         /* Master pane */
+        hexDiff = new HexDiff();
         this.referenceView = new HexDiffWebView();
         this.comparedView = new HexDiffWebView();
         this.splitPane = new SplitPane(referenceView, comparedView);
         this.progressIndicator = new ProgressIndicator();
         progressIndicator.setMaxWidth(80);
         progressIndicator.setMaxHeight(80);
-        StackPane stackPane = new StackPane(splitPane, progressIndicator);
+        HBox modalBackground = new HBox();
+        modalBackground.setFillHeight(true);
+        HBox.setHgrow(modalBackground, Priority.ALWAYS);
+        modalBackground.setStyle("-fx-background-color: rgba(255, 255, 255, 0.7);");
+        modalBackground.visibleProperty().bind(progressIndicator.visibleProperty());
+        StackPane stackPane = new StackPane(splitPane, modalBackground, progressIndicator);
         masterDetailPane.setMasterNode(stackPane);
         masterDetailPane.setDividerPosition(0.3);
 
@@ -53,12 +59,16 @@ public class HexDiffBrowser extends HexBrowser {
                 }
             }
         };
-
         referenceView.getWebView().setOnScroll(scrollZoom);
         comparedView.getWebView().setOnScroll(scrollZoom);
         linesPerPageTextField.setText(String.valueOf(linesPerPage));
     }
 
+    /*******************************************************************************************************************
+     *                                                                                                                 *
+     * DIFF PARAMETERS                                                                                                 *
+     *                                                                                                                 *
+     ******************************************************************************************************************/
 
     /**
      * The file used as a reference in the diff
@@ -94,6 +104,12 @@ public class HexDiffBrowser extends HexBrowser {
             setOffsetMax(comparedFile.length());
     }
 
+    /*******************************************************************************************************************
+     *                                                                                                                 *
+     * DIFF GENERATION                                                                                                 *
+     *                                                                                                                 *
+     ******************************************************************************************************************/
+
     /**
      * The object holding the differences
      */
@@ -126,11 +142,27 @@ public class HexDiffBrowser extends HexBrowser {
         this.comparedView = comparedView;
     }
 
+    /**
+     * Cancel loading a diff generation
+     */
+    public void cancel() {
+        if(hexDiff.getDiffGenerator().getState()== Worker.State.RUNNING){
+            hexDiff.getDiffGenerator().cancel();
+        }
+    }
+
+
     public void loadDiff(File reference, File compared, long offset){
         setReferenceFile(reference);
         setComparedFile(compared);
         setOffset(offset);
-        hexDiff = new HexDiff(reference,compared);
+        hexDiff.setFiles(reference, compared);
+        reloadDiff();
+    }
+
+    public void reloadDiff(){
+        cancel();
+        progressIndicator.progressProperty().unbind();
         progressIndicator.progressProperty().bind(hexDiff.getDiffGenerator().progressProperty());
         progressIndicator.setVisible(true);
         toolBar.setDisable(true);
@@ -145,7 +177,12 @@ public class HexDiffBrowser extends HexBrowser {
         });
         try {
             hexDiff.loadDiff(offset, linesPerPage);
-        } catch (IOException ignored) {}
+        } catch (IOException e) {
+            Main.logger.log(Level.WARNING,
+                    "Error when loading diff. \nFile 1: "
+                            + referenceFile.toString()
+                            + "\nFile 2: " + comparedFile.toString(),e);
+        }
     }
 
     /**
@@ -165,7 +202,7 @@ public class HexDiffBrowser extends HexBrowser {
 
     /**
      * We have to override the parent method to take into account the modified pages
-     * @param linesPerPage
+     * @param linesPerPage  The number of lines per page
      */
     @Override
     public void setLinesPerPage(int linesPerPage) {
@@ -197,17 +234,17 @@ public class HexDiffBrowser extends HexBrowser {
      */
     private ObservableList<String> modifiedOffsets;
 
-    private void setModifiedOffsets(SortedSet<Long> modifiedOffsets){
+    private void setModifiedOffsets(SortedSet<Long> pModifiedOffsets){
         this.modifiedOffsets.clear();
         int previousPage = 0;
-        for(Long modOffset : modifiedOffsets){
+        for(Long modOffset : pModifiedOffsets){
             int page = offsetToPage(modOffset);
             if(page!=previousPage){
                 this.modifiedOffsets.add(String.format("%06X", modOffset));
             }
             previousPage = page;
         }
-        setModifiedPages(modifiedOffsets);
+        setModifiedPages(pModifiedOffsets);
     }
 
     /**
@@ -218,10 +255,31 @@ public class HexDiffBrowser extends HexBrowser {
         modifiedOffsets = FXCollections.observableArrayList();
 
         VBox detailPane = new VBox();
+        ScrollPane scrollPane = new ScrollPane(detailPane);
+        scrollPane.setFitToWidth(true);
+        /* List of modified pages and modified offsets */
+        VBox modifiedBookmarks = initModifiedBookMarks();
 
+        /* Parameters for the diff generation */
+        TitledPane diffParameters = initParametersPane();
+
+        detailPane.setFillWidth(true);
+        detailPane.getChildren().addAll(modifiedBookmarks, diffParameters);
+        detailPane.setSpacing(10);
+        detailPane.setPadding(new Insets(0));
+        masterDetailPane.setDetailNode(scrollPane);
+    }
+
+    /**
+     * Create the VBox storing the list of modified pages and modified offsets
+     * @return  The VBox
+     */
+    private VBox initModifiedBookMarks(){
         /* List of modified pages and modified offsets */
         HBox modifiedPagesHbox = new HBox();
         HBox modifiedOffsetsHbox = new HBox();
+        HBox.setHgrow(modifiedPagesHbox, Priority.ALWAYS);
+        HBox.setHgrow(modifiedOffsetsHbox, Priority.ALWAYS);
         modifiedPagesHbox.setSpacing(10);
         modifiedOffsetsHbox.setSpacing(10);
         modifiedPagesHbox.setAlignment(Pos.BASELINE_CENTER);
@@ -231,8 +289,12 @@ public class HexDiffBrowser extends HexBrowser {
         ListView<String> modifiedOffsetsList = new ListView<>(modifiedOffsets);
         modifiedPagesList.setOrientation(Orientation.HORIZONTAL);
         modifiedOffsetsList.setOrientation(Orientation.HORIZONTAL);
-        modifiedPagesList.setMaxHeight(55);
-        modifiedOffsetsList.setMaxHeight(55);
+        modifiedPagesList.setMinHeight(45);
+        modifiedOffsetsList.setMinHeight(45);
+        modifiedPagesList.setPrefHeight(55);
+        modifiedOffsetsList.setPrefHeight(55);
+        modifiedPagesList.setMaxHeight(65);
+        modifiedOffsetsList.setMaxHeight(65);
         HBox.setHgrow(modifiedPagesList, Priority.ALWAYS);
         HBox.setHgrow(modifiedOffsetsList, Priority.ALWAYS);
         modifiedPagesList.setCellFactory(param -> new ModifiedPageCell());
@@ -249,13 +311,10 @@ public class HexDiffBrowser extends HexBrowser {
         modifiedBookmarks.setSpacing(10);
         modifiedBookmarks.setFillWidth(true);
         modifiedBookmarks.setMaxHeight(120);
+        modifiedBookmarks.setPadding(new Insets(20));
         VBox.setVgrow(modifiedBookmarks, Priority.NEVER);
 
-
-        detailPane.getChildren().add(modifiedBookmarks);
-        detailPane.setSpacing(10);
-        detailPane.setPadding(new Insets(20));
-        masterDetailPane.setDetailNode(detailPane);
+        return modifiedBookmarks;
     }
 
     /**
@@ -305,6 +364,84 @@ public class HexDiffBrowser extends HexBrowser {
         }
     }
 
+    /**
+     * Create the pane that lets the user modify the hexDiff parameters
+     * @return  The titled pane
+     */
+    private TitledPane initParametersPane(){
+        TitledPane diffParameters = new TitledPane();
+        diffParameters.setText("Parameters");
+        VBox diffParametersVBox = new VBox();
+        diffParametersVBox.setFillWidth(true);
+        diffParametersVBox.setSpacing(20);
+        //WINDOW SIZE
+        HBox windowSizeHbox = new HBox();
+        Label windowSizeLabel = new Label("Window size");
+        TextField windowSizeTextField = new TextField();
+        windowSizeTextField.setAlignment(Pos.BASELINE_RIGHT);
+        ObservableList<String> windowSizeUnitList= FXCollections.observableArrayList("B", "KB", "MB");
+        ComboBox<String> windowSizeUnit = new ComboBox<>(windowSizeUnitList);
+        windowSizeUnit.getSelectionModel().select("KB");
+        Label currentWSize = new Label("Current value = "
+                + hexDiff.getWindowSize() + " "
+                + hexDiff.getFormattedWindowSizeUnit());
+        windowSizeHbox.getChildren().setAll(windowSizeLabel, windowSizeTextField, windowSizeUnit, currentWSize);
+        windowSizeHbox.setAlignment(Pos.CENTER_LEFT);
+        windowSizeHbox.setSpacing(10);
+        //WINDOW STEP
+        HBox windowStepHBox = new HBox();
+        Label windowStepLabel = new Label("Window step");
+        TextField windowStepTextField = new TextField();
+        windowStepTextField.setAlignment(Pos.BASELINE_RIGHT);
+        ObservableList<String> windowStepUnitList= FXCollections.observableArrayList("B", "KB", "MB");
+        ComboBox<String> windowStepUnit = new ComboBox<>(windowStepUnitList);
+        windowStepUnit.getSelectionModel().select("KB");
+        Label currentWStep = new Label("Current value = "
+                + hexDiff.getWindowStep() + " "
+                + hexDiff.getFormattedWindowStepUnit());
+        windowStepHBox.getChildren().setAll(windowStepLabel, windowStepTextField, windowStepUnit, currentWStep);
+        windowStepHBox.setAlignment(Pos.CENTER_LEFT);
+        windowStepHBox.setSpacing(10);
+        //Applying modifications
+        Button applyParameters = new Button("Apply");
+        applyParameters.setOnAction(event -> {
+            //Apply modifications for the window size
+            if (!windowSizeTextField.getText().trim().isEmpty()) {
+                try {
+                    long wSize = Long.parseLong(windowSizeTextField.getText());
+                    String wSizeUnit = windowSizeUnit.getSelectionModel().getSelectedItem();
+                    hexDiff.setWindowSize(wSize);
+                    hexDiff.setWindowSizeUnit(wSizeUnit);
+                    hexDiff.setDiffComputed(false);
+                    currentWSize.setText("Current value = "
+                            + hexDiff.getWindowSize() + " "
+                            + hexDiff.getFormattedWindowSizeUnit());
+                } catch (NumberFormatException e) {
+                    Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                            "Error parsing the diff parameters. Long integer required.", e);
+                }
+            }
+            if (!windowStepTextField.getText().trim().isEmpty()) {
+                try {
+                    long wStep = Long.parseLong(windowStepTextField.getText());
+                    String wStepUnit = windowStepUnit.getSelectionModel().getSelectedItem();
+                    hexDiff.setWindowStep(wStep);
+                    hexDiff.setWindowStepUnit(wStepUnit);
+                    hexDiff.setDiffComputed(false);
+                    currentWStep.setText("Current value = "
+                            + hexDiff.getWindowStep() + " "
+                            + hexDiff.getFormattedWindowStepUnit());
+                } catch (NumberFormatException e) {
+                    Logger.getLogger(getClass().getName()).log(Level.WARNING,
+                            "Error parsing the diff parameters. Long integer required.", e);
+                }
+            }
+        });
+        diffParametersVBox.getChildren().setAll(windowSizeHbox, windowStepHBox, applyParameters);
+        diffParameters.setContent(diffParametersVBox);
+        return diffParameters;
+    }
+
     /*******************************************************************************************************************
      *                                                                                                                 *
      * NAVIGATION                                                                                                      *
@@ -316,11 +453,16 @@ public class HexDiffBrowser extends HexBrowser {
      * Reload the hex view
      */
     protected void reloadWebView(){
-        try {
-            hexDiff.loadDiff(offset, linesPerPage);
-        } catch (IOException ignored) {}
-        this.referenceView.loadLines(hexDiff, true);
-        this.comparedView.loadLines(hexDiff, false);
+        if(hexDiff.isDiffComputed()) {
+            try {
+                hexDiff.loadDiff(offset, linesPerPage);
+            } catch (IOException ignored) {
+            }
+            this.referenceView.loadLines(hexDiff, true);
+            this.comparedView.loadLines(hexDiff, false);
+        } else {
+            reloadDiff();
+        }
     }
 
     /**

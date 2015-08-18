@@ -29,7 +29,6 @@ public class Controller implements Initializable {
 
         /* Hex Diff Testing */
         String resourcesPath = "test-resources/";
-        String referencePath = resourcesPath + "reference.pdf";
         String inserted = "inserted.pdf";
         String inserted1 = "inserted1.pdf";
         String inserted2 = "inserted2.pdf";
@@ -39,9 +38,12 @@ public class Controller implements Initializable {
         String modified = "modified.pdf";
         String modified1 = "modified1.pdf";
         String modified2 = "modified2.pdf";
-        String comparedPath = resourcesPath + modified2;
-        File reference = new File(bigPdfRef);
-        File compared = new File(bigPdfCom);
+        String modified3 = "modified3.pdf";
+
+        String referencePath = resourcesPath + "reference3.pdf";
+        String comparedPath = resourcesPath + modified3;
+        File reference = new File(referencePath);
+        File compared = new File(comparedPath);
         assert(reference.exists());
         //browser.loadFile(reference, 0);
         browser.loadDiff(reference,compared,0);

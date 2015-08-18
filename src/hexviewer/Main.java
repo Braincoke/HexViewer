@@ -6,7 +6,11 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.logging.Logger;
+
 public class Main extends Application {
+
+    public static Logger logger = Logger.getLogger("");
 
     @Override
     public void start(Stage primaryStage) throws Exception{
