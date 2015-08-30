@@ -1,0 +1,19 @@
+<?import com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowser?>
+<?import javafx.scene.layout.*?>
+<?import com.erwandano.hexviewer.viewer.dumpviewer.HexDumpBrowser?>
+<AnchorPane fx:controller="Controller"
+          xmlns:fx="http://javafx.com/fxml"
+            fx:id="anchorPane">
+            <HexDiffBrowser fx:id="diffBrowser"
+                            prefWidth="900"
+                    AnchorPane.bottomAnchor="0"
+                    AnchorPane.leftAnchor="0"
+                    AnchorPane.rightAnchor="0"
+                    AnchorPane.topAnchor="0"/>
+            <HexDumpBrowser fx:id="dumpBrowser"
+                            prefWidth="900"
+                            AnchorPane.bottomAnchor="0"
+                            AnchorPane.leftAnchor="0"
+                            AnchorPane.rightAnchor="0"
+                            AnchorPane.topAnchor="0"/>
+</AnchorPane>

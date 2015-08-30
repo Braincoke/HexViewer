@@ -1,0 +1,70 @@
+<?xml version="1.0"?>
+<project name="FSDiff" basedir="." default="compile"  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+
+    <property file="build.properties"/>
+
+
+
+    <!-- Clean the build directory -->
+    <target name="clean" description="Clean output directories">
+        <mkdir dir="${build.dir}" />
+        <mkdir dir="${build.classes.dir}"/>
+        <mkdir dir="${build.dist.dir}"/>
+        <mkdir dir="${build.dist.lib.dir}" />
+        <delete>
+            <fileset dir="${build.classes.dir}" includes="**/*"/>
+            <fileset dir="${build.dist.dir}" includes="**/*"/>
+            <fileset dir="${build.dist.lib.dir}" includes="**/*"/>
+        </delete>
+    </target>
+
+    <!-- Indicates libraries location for the compilation -->
+    <path id="lib-classpath">
+        <fileset dir="${lib.dir}">
+            <include name="**/*.jar"/>
+        </fileset>
+        <pathelement path="${build.classes.dir}"/>
+    </path>
+
+    <!-- Compile java files and copy all other files -->
+    <target name="compile" depends="clean" description="Compile source tree java files">
+        <javac destdir="${build.classes.dir}">
+            <src path="${src.dir}"/>
+            <classpath refid="lib-classpath"/>
+        </javac>
+        <!-- Used for adding FXML and CSS files to the .jar -->
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${src.dir}" excludes="**/*.java" includes="**"/>
+        </copy>
+        <!-- Used for adding libraries in the same parent directory as the .jar -->
+        <!-- TODO It would be nice to have the libraries bundled in the .jar -->
+        <copy todir="${build.dist.lib.dir}" >
+            <fileset dir="${lib.dir}" includes="${jar.files}" />
+        </copy>
+    </target>
+
+
+    <!-- Deploy the JavaFX Application -->
+    <target name="deploy" depends="clean,compile">
+
+        <taskdef resource="com/sun/javafx/tools/ant/antlib.xml"
+                 uri="javafx:com.sun.javafx.tools.ant"
+                 classpath="${JAVA_HOME}/lib/ant-javafx.jar"/>
+
+        <fx:application id="app"
+                        name="${name}"
+                        mainClass="Main"/>
+
+        <!-- Indicates to the final .jar where to find the external libraries -->
+        <fx:resources id="appResources">
+            <fx:fileset dir="${build.dist.dir}" includes="lib/${jar.files}"/>
+        </fx:resources>
+
+        <fx:jar destfile="${build.dist.dir}/HexViewer.jar">
+            <fx:application refid="app"/>
+            <fx:resources refid="appResources"/>
+            <fileset dir="${build.classes.dir}"/>
+        </fx:jar>
+
+    </target>
+</project>
