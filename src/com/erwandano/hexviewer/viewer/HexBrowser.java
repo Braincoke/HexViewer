@@ -1,7 +1,8 @@
 package com.erwandano.hexviewer.viewer;
 
-import com.erwandano.hexviewer.components.buttons.FAButton;
-import com.erwandano.hexviewer.components.buttons.IconButton;
+
+import com.erwandano.fxcomponents.buttons.FAButton;
+import com.erwandano.fxcomponents.buttons.IconButton;
 import com.erwandano.hexviewer.viewer.dumpviewer.SearchTab;
 import javafx.geometry.Insets;
 import javafx.geometry.Orientation;

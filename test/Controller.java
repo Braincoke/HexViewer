@@ -4,7 +4,6 @@ import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
 import com.erwandano.hexviewer.utils.HexDumpLine;
 import com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowser;
-import com.erwandano.hexviewer.viewer.dumpviewer.HexDumpWebView;
 
 import java.io.File;
 import java.net.URL;
@@ -53,11 +52,11 @@ public class Controller implements Initializable {
         String deleted1 = "deleted1.pdf";
         String deleted2 = "deleted2.pdf";
         String modified = "modified.pdf";
-        String modified1 = "modified1.pdf";
-        String modified2 = "modified2.pdf";
-        String modified3 = "modified3.pdf";
+        String modified1 = "todo/modified1.pdf";
+        String modified2 = "todo/modified2.pdf";
+        String modified3 = "todo/modified3.pdf";
 
-        String referencePath = resourcesPath + "reference3.pdf";
+        String referencePath = resourcesPath + "todo/reference3.pdf";
         String comparedPath = resourcesPath + modified3;
         File reference = new File(referencePath);
         File compared = new File(comparedPath);

@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<project name="FSDiff" basedir="." default="compile"  xmlns:fx="javafx:com.sun.javafx.tools.ant">
+<project name="HexViewer" basedir="." default="compile"  xmlns:fx="javafx:com.sun.javafx.tools.ant">
 
     <property file="build.properties"/>
 
@@ -60,7 +60,7 @@
             <fx:fileset dir="${build.dist.dir}" includes="lib/${jar.files}"/>
         </fx:resources>
 
-        <fx:jar destfile="${build.dist.dir}/HexViewer.jar">
+        <fx:jar destfile="${build.dist.dir}/${name}.jar">
             <fx:application refid="app"/>
             <fx:resources refid="appResources"/>
             <fileset dir="${build.classes.dir}"/>

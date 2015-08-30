@@ -1,6 +1,7 @@
 package com.erwandano.hexviewer.viewer.diffviewer;
 
-import com.erwandano.hexviewer.components.buttons.FAButton;
+
+import com.erwandano.fxcomponents.buttons.FAButton;
 import com.erwandano.hexviewer.utils.HexDiff;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
