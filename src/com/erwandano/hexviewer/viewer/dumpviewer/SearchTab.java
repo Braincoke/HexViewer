@@ -13,6 +13,7 @@ public class SearchTab extends Tab {
     public SearchTab(HexBrowser hexBrowser){
         this.hexBrowser = hexBrowser;
         setClosable(false);
+        setId("search-tab");
     }
 
     /**

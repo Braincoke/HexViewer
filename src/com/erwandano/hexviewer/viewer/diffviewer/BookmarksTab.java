@@ -103,7 +103,7 @@ public class BookmarksTab extends Tab {
         /* Handle tab change */
         graphics.setOnMouseClicked(event -> hexDiffBrowser.tabSelection(this));
 
-
+        splitHBox.setId("bookmarks-tab-content");
         this.setId("bookmarks-tab");
 
     }

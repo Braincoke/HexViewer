@@ -228,16 +228,14 @@ public class HexDiffBrowser extends HexBrowser {
      *                                                                                                                 *
      ******************************************************************************************************************/
 
-
     protected BookmarksTab bookmarksTab;
 
     protected ParametersTab parametersTab;
 
 
-    public void tabSelection(Tab tab) {
-        Tab selectedTab = bottomTabPane.getSelectionModel().getSelectedItem();
+    public void tabSelection(Tab clickedTab) {
         //The user clicked on an already selected tab to hide or show the left menu
-        if(selectedTab==tab){
+        if(selectedTab.getId().compareTo(clickedTab.getId())==0){
             if(bottomTabHidden) {
                 bottomTabPane.getSelectionModel().getSelectedItem().getStyleClass().remove("hidden");
                 showBottomTabPane();
@@ -248,7 +246,8 @@ public class HexDiffBrowser extends HexBrowser {
         } else {
             //The user wants to change tabs
                 bottomTabPane.getSelectionModel().getSelectedItem().getStyleClass().remove("hidden");
-                bottomTabPane.getSelectionModel().select(tab);
+                bottomTabPane.getSelectionModel().select(clickedTab);
+                selectedTab = clickedTab;
                 showBottomTabPane();
         }
     }

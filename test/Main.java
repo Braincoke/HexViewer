@@ -23,7 +23,7 @@ public class Main extends Application {
         primaryStage.setTitle("HexViewer");
         primaryStage.setScene(new Scene(root, 1200, 500));
 
-        controller.loadDump();
+        controller.loadDiff();
 
         primaryStage.show();
     }

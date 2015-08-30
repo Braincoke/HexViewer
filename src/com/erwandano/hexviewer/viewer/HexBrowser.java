@@ -293,6 +293,11 @@ public abstract class HexBrowser extends AnchorPane {
     }
 
     /**
+     * The currently selected tab;
+     */
+    protected Tab selectedTab;
+
+    /**
      * The search tab that is included in every viewer
      */
     protected SearchTab searchTab;
@@ -359,8 +364,9 @@ public abstract class HexBrowser extends AnchorPane {
         searchTab.setGraphic(label);
 
         bottomTabPane.setSide(Side.BOTTOM);
-        bottomTabPane.setMinHeight(40);
+        bottomTabPane.setMinHeight(20);
         bottomTabPane.getTabs().add(searchTab);
+        selectedTab = searchTab;
         mainSplitPane.getItems().add(0, bottomTabPane);
         savedMainDivider = defaultMainDivider;
 

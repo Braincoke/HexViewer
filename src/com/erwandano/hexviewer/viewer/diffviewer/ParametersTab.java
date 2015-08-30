@@ -108,6 +108,7 @@ public class ParametersTab extends Tab{
         diffParametersVBox.setSpacing(20);
         diffParametersVBox.setAlignment(Pos.CENTER);
 
+        diffParametersVBox.setId("parameters-tab-content");
         this.setContent(diffParametersVBox);
 
         /* Create the graphics */
@@ -116,6 +117,7 @@ public class ParametersTab extends Tab{
 
         /* Handle tab change events */
         graphics.setOnMouseClicked(event -> hexDiffBrowser.tabSelection(this));
+
         setId("parameters-tab");
 
     }
