@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.erwandano.fxcomponents.control.SplitTabPane?>
+<?import com.erwandano.hexviewer.viewer.diffviewer.HexDiffWebView?>
+<?import javafx.scene.control.ProgressIndicator?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.*?>
+<StackPane xmlns:fx="http://javafx.com/fxml"
+           AnchorPane.topAnchor="0"
+           AnchorPane.rightAnchor="0"
+           AnchorPane.leftAnchor="0"
+           AnchorPane.bottomAnchor="0"
+           fx:controller="com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowserController">
+    <VBox  fx:id="vBox">
+        <fx:include source="../toolbar/Toolbar.fxml" fx:id="toolBar"/>
+        <SplitTabPane fx:id="splitTabPane" tabPaneMinHeight="25" side="BOTTOM">
+            <tabs>
+                <fx:include source="bookmarkstab/BookmarksTab.fxml" fx:id="bookmarksTab" />
+                <fx:include source="parameterstab/ParametersTab.fxml" fx:id="parametersTab"/>
+            </tabs>
+            <content>
+                <SplitPane fx:id="diffView" orientation="HORIZONTAL">
+                    <items>
+                        <HexDiffWebView fx:id="referenceView"/>
+                        <HexDiffWebView fx:id="comparedView" />
+                    </items>
+                </SplitPane>
+            </content>
+        </SplitTabPane>
+    </VBox>
+    <HBox fillHeight="true" visible="false" fx:id="modalBackground" HBox.hgrow="ALWAYS" styleClass="modal-background" />
+    <ProgressIndicator fx:id="progressIndicator" visible="false" maxHeight="80" maxWidth="80" />
+
+</StackPane>

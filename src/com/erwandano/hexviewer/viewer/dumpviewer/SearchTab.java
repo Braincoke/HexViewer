@@ -1,6 +1,6 @@
 package com.erwandano.hexviewer.viewer.dumpviewer;
 
-import com.erwandano.hexviewer.viewer.HexBrowser;
+import com.erwandano.hexviewer.viewer.HexBrowserController;
 import javafx.scene.control.Tab;
 
 /**
@@ -10,8 +10,8 @@ public class SearchTab extends Tab {
 
     //TODO
 
-    public SearchTab(HexBrowser hexBrowser){
-        this.hexBrowser = hexBrowser;
+    public SearchTab(HexBrowserController hexBrowserController){
+        this.hexBrowserController = hexBrowserController;
         setClosable(false);
         setId("search-tab");
     }
@@ -19,5 +19,5 @@ public class SearchTab extends Tab {
     /**
      * The parent HexBrowser
      */
-    private HexBrowser hexBrowser;
+    private HexBrowserController hexBrowserController;
 }

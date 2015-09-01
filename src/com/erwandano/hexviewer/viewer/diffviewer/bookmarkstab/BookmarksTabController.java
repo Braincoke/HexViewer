@@ -1,40 +1,48 @@
-package com.erwandano.hexviewer.viewer.diffviewer;
+package com.erwandano.hexviewer.viewer.diffviewer.bookmarkstab;
 
-
-import com.erwandano.fxcomponents.buttons.FAButton;
+import com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowserController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Label;
+import javafx.fxml.FXML;
+import javafx.fxml.Initializable;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Tab;
-import javafx.scene.layout.HBox;
-import javafx.scene.layout.Priority;
-import javafx.scene.layout.VBox;
-import org.controlsfx.glyphfont.FontAwesome;
 
+import java.net.URL;
+import java.util.ResourceBundle;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
- * A tab used to bookmark modified offsets and modified pages
+ * Controller for the bookmarks tab.
  */
-public class BookmarksTab extends Tab {
+public class BookmarksTabController implements Initializable {
 
 
-    public BookmarksTab(HexDiffBrowser hexDiffBrowser){
-        setClosable(false);
-        this.hexDiffBrowser = hexDiffBrowser;
-        this.modifiedPages = FXCollections.observableArrayList();
-        this.modifiedOffsets = FXCollections.observableArrayList();
-        init();
+    @FXML
+    private ListView<String> modifiedOffsetsListView;
+
+    @FXML
+    private ListView<Integer> modifiedPagesListView;
+
+
+    public BookmarksTabController(){
+        modifiedOffsets = FXCollections.observableArrayList();
+        modifiedPages = FXCollections.observableArrayList();
     }
-
 
     /**
      * The parent HexDiffBrowser
      */
-    private HexDiffBrowser hexDiffBrowser;
+    private HexDiffBrowserController hexDiffBrowserController;
+
+    public void setHexDiffBrowserController(HexDiffBrowserController browser){
+        this.hexDiffBrowserController = browser;
+        modifiedOffsetsListView.setItems(modifiedOffsets);
+        modifiedPagesListView.setItems(modifiedPages);
+        modifiedOffsetsListView.setCellFactory(param -> new ModifiedOffsetCell());
+        modifiedPagesListView.setCellFactory(param -> new ModifiedPageCell());
+    }
 
     /**
      * The list of pages that were modified
@@ -45,7 +53,7 @@ public class BookmarksTab extends Tab {
         modifiedPages.clear();
         SortedSet<Integer> pages = new TreeSet<>();
         for(Long modOffset : modifiedOffsets){
-            int page = hexDiffBrowser.offsetToPage(modOffset);
+            int page = hexDiffBrowserController.offsetToPage(modOffset);
             pages.add(page);
         }
         modifiedPages.setAll(pages);
@@ -61,7 +69,7 @@ public class BookmarksTab extends Tab {
         this.modifiedOffsets.clear();
         int previousPage = 0;
         for(Long modOffset : pModifiedOffsets){
-            int page = hexDiffBrowser.offsetToPage(modOffset);
+            int page = hexDiffBrowserController.offsetToPage(modOffset);
             if(page!=previousPage){
                 this.modifiedOffsets.add(String.format("%06X", modOffset));
             }
@@ -70,41 +78,8 @@ public class BookmarksTab extends Tab {
         setModifiedPages(pModifiedOffsets);
     }
 
-    private void init(){
-                /* First the offsets bookmarks */
-        ListView<String> modifiedOffsetsList = new ListView<>(modifiedOffsets);
-        modifiedOffsetsList.setCellFactory(param -> new ModifiedOffsetCell());
-        Label modifiedOffsetsLabel = new Label("Modified offsets");
-        modifiedOffsetsLabel.setLabelFor(modifiedOffsetsList);
-        VBox offsetsBookmarks = new VBox(modifiedOffsetsLabel, modifiedOffsetsList);
-        offsetsBookmarks.setSpacing(10);
-        VBox.setVgrow(modifiedOffsetsList, Priority.ALWAYS);
-
-        /* Then the pages bookmarks */
-        ListView<Integer> modifiedPagesList = new ListView<>(modifiedPages);
-        modifiedPagesList.setCellFactory(param -> new ModifiedPageCell());
-        Label modifiedPagesLabel = new Label("Modified pages");
-        modifiedPagesLabel.setLabelFor(modifiedPagesList);
-        VBox pagesBookmarks = new VBox(modifiedPagesLabel, modifiedPagesList);
-        pagesBookmarks.setSpacing(10);
-        VBox.setVgrow(modifiedPagesList, Priority.ALWAYS);
-
-        /* Combine the two */
-        HBox splitHBox = new HBox(offsetsBookmarks, pagesBookmarks);
-        splitHBox.setFillHeight(true);
-
-        /* Add it to the bookmarks tab */
-        this.setContent(splitHBox);
-
-        /* Create the graphics for the tab */
-        Label graphics = new Label("Bookmarks", FAButton.fontAwesome.create(FontAwesome.Glyph.BOOKMARK.getChar()));
-        this.setGraphic(graphics);
-
-        /* Handle tab change */
-        graphics.setOnMouseClicked(event -> hexDiffBrowser.tabSelection(this));
-
-        splitHBox.setId("bookmarks-tab-content");
-        this.setId("bookmarks-tab");
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
 
     }
 
@@ -131,7 +106,7 @@ public class BookmarksTab extends Tab {
                 setText(String.valueOf(item));
                 this.setOnMouseClicked(event -> {
                     if(event.getClickCount()>=2){
-                        hexDiffBrowser.gotoPage(item);
+                        hexDiffBrowserController.gotoPage(item);
                     }
                 });
             }
@@ -154,8 +129,8 @@ public class BookmarksTab extends Tab {
                 this.setOnMouseClicked(event -> {
                     if(event.getClickCount()>=2){
                         long offset = Long.parseLong(item, 16);
-                        int page = hexDiffBrowser.offsetToPage(offset);
-                        hexDiffBrowser.gotoPage(page);
+                        int page = hexDiffBrowserController.offsetToPage(offset);
+                        hexDiffBrowserController.gotoPage(page);
                     }
                 });
             }

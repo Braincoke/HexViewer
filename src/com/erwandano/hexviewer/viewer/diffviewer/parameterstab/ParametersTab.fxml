@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.erwandano.fxcomponents.control.SplitTab?>
+<?import javafx.collections.FXCollections?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import java.lang.*?>
+<SplitTab xmlns:fx="http://javafx.com/fxml"
+          text="Parameters" fx:controller="com.erwandano.hexviewer.viewer.diffviewer.parameterstab.ParametersTabController">
+    <VBox id="parameters-tab-content" alignment="CENTER">
+        <HBox alignment="CENTER">
+            <Label text="Window size" />
+            <TextField fx:id="windowSize" alignment="BASELINE_RIGHT"/>
+            <ComboBox fx:id="windowSizeUnit">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="B" />
+                        <String fx:value="KB" />
+                        <String fx:value="MB" />
+                    </FXCollections>
+                </items>
+                <value>
+                    <String fx:value="KB" />
+                </value>
+            </ComboBox>
+            <Label fx:id="currentSize" text="Current value =   KB" />
+        </HBox>
+        <HBox alignment="CENTER">
+            <Label text="Window step" />
+            <TextField fx:id="windowStep" alignment="BASELINE_RIGHT"/>
+            <ComboBox fx:id="windowStepUnit">
+                <items>
+                    <FXCollections fx:factory="observableArrayList">
+                        <String fx:value="B" />
+                        <String fx:value="KB" />
+                        <String fx:value="MB" />
+                    </FXCollections>
+                </items>
+                <value>
+                    <String fx:value="KB" />
+                </value>
+            </ComboBox>
+            <Label fx:id="currentStep" text="Current value =   KB" />
+        </HBox>
+        <HBox alignment="CENTER">
+            <Button text="Apply" onAction="#setHexDiffParameters" />
+        </HBox>
+    </VBox>
+</SplitTab>

@@ -1,67 +1,64 @@
 package com.erwandano.hexviewer.viewer.dumpviewer;
 
-import com.erwandano.hexviewer.viewer.HexBrowser;
+import javafx.fxml.FXMLLoader;
+import javafx.fxml.JavaFXBuilderFactory;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.VBox;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * A simple interface to browse the hex dump of a file
+ * This is a proxy class the real controller is the HexDumpBrowserController
  */
-public class HexDumpBrowser extends HexBrowser {
+public class HexDumpBrowser extends AnchorPane{
 
     public HexDumpBrowser(){
         super();
-
-        /* Master pane */
-        this.webView = new HexDumpWebView();
-        this.mainSplitPane.getItems().add(0, webView);
-
-        //CTRL + SCROLL WHEEL TO ZOOM IN OR OUT
-        webView.getWebView().setOnScroll(event -> {
-            if (event.isControlDown()) {
-                if (event.getDeltaY() > 0) {
-                    zoomIn();
-                } else {
-                    zoomOut();
-                }
-            }
-        });
-
-        /* Save dividers position */
-        mainSplitPane.setDividerPositions(1);
-        savedMainDivider = mainSplitPane.getDividers().get(0).getPosition();
-        mainSplitPane.getDividers().get(0).positionProperty().addListener((observable, oldValue, newValue) -> {
-            bottomTabHidden = newValue.doubleValue() < hiddenThreshold;
-        });
-
-        linesPerPageTextField.setText(String.valueOf(linesPerPage));
+        /* Load the correct FXML */
+        String fxml = "com/erwandano/hexviewer/viewer/dumpviewer/HexDumpBrowser.fxml";
+        FXMLLoader loader = new FXMLLoader();
+        loader.setBuilderFactory(new JavaFXBuilderFactory());
+        loader.setLocation(getClass().getClassLoader().getResource(fxml));
+        InputStream is = getClass().getClassLoader().getResourceAsStream(fxml);
+        VBox vBox;
+        try {
+            vBox = loader.load(is);
+            this.getChildren().add(vBox);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        controller = (HexDumpBrowserController) loader.getController();
     }
+
+    /**
+     * The browser controller
+     */
+    private HexDumpBrowserController controller;
 
     /**
      * The file which will be displayed
      */
-    private File file;
 
     public File getFile() {
-        return file;
+        return controller.getFile();
     }
 
     public void setFile(File file) {
-        this.file = file;
-        setOffsetMax(file.length());
+        controller.setFile(file);
     }
 
     /**
      * The hex dump viewer
      */
-    private HexDumpWebView webView;
-
     public HexDumpWebView getWebView() {
-        return webView;
+        return controller.getWebView();
     }
 
     public void setWebView(HexDumpWebView webView) {
-        this.webView = webView;
+        controller.setWebView(webView);
     }
 
     /**
@@ -70,9 +67,7 @@ public class HexDumpBrowser extends HexBrowser {
      * @param offset    The starting point of the hex dump
      */
     public void loadFile(File file, long offset){
-        setFile(file);
-        setOffset(offset);
-        this.webView.loadLines(file, offset, linesPerPage);
+        controller.loadFile(file, offset);
     }
 
     /*******************************************************************************************************************
@@ -84,26 +79,23 @@ public class HexDumpBrowser extends HexBrowser {
     /**
      * Reload the hex view
      */
-    protected void reloadWebView(){
-        webView.loadLines(file, offset, linesPerPage);
+    public void reloadWebView(){
+        controller.reloadWebView();
     }
 
     /**
      * Zoom in : enlarge the webview's font
      */
-    protected void zoomIn(){
-        Double currentZoom = webView.getWebView().getZoom();
-        webView.getWebView().zoomProperty().setValue(currentZoom + ZOOM_FACTOR);
+    public void zoomIn(){
+        controller.zoomIn();
     }
 
 
     /**
      * Zoom out : shrink the webview's font
      */
-    protected void zoomOut(){
-        Double currentZoom = webView.getWebView().getZoom();
-        webView.getWebView().zoomProperty().setValue(currentZoom-ZOOM_FACTOR);
+    public void zoomOut(){
+        controller.zoomOut();
     }
-
 
 }

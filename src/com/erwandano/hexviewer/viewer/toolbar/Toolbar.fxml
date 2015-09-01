@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.erwandano.fxcomponents.buttons.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.HBox?>
+<ToolBar xmlns:fx="http://javafx.com/fxml" fx:id="toolBar"
+      fx:controller="com.erwandano.hexviewer.viewer.toolbar.ToolbarController">
+    <items>
+        <!-- Arrow navigation -->
+        <IconButton icon="CHEVRON_LEFT" onAction="#previousPage" />
+        <HBox alignment="CENTER" HBox.hgrow="NEVER" >
+            <Label fx:id="currentPageLabel" text="1" />
+            <Label text=" / " />
+            <Label fx:id="pageMaxLabel" />
+            <padding>
+                <Insets top="0" right="10" bottom="0" left="10" />
+            </padding>
+        </HBox>
+        <IconButton icon="CHEVRON_RIGHT" onAction="#nextPage" />
+        <Separator/>
+        <!-- Jump to page -->
+        <Label text="Go to page" />
+        <TextField fx:id="gotoPageTextField" onAction="#gotoPage" prefWidth="50" alignment="BASELINE_RIGHT"/>
+        <!-- Jump to offset -->
+        <Label text="Go to offset" />
+        <TextField fx:id="gotoOffsetTextField" onAction="#gotoOffset" prefWidth="90" alignment="BASELINE_RIGHT"/>
+        <Separator/>
+        <!-- Lines per page -->
+        <Label text="Lines per page" />
+        <TextField fx:id="linesPerPageTextField" prefWidth="60" onAction="#setLinesPerPage" alignment="BASELINE_RIGHT"/>
+        <Separator/>
+        <!-- Zoom -->
+        <IconButton icon="SEARCH_PLUS" onAction="#zoomIn" />
+        <IconButton icon="SEARCH_MINUS" onAction="#zoomOut" />
+        <IconButton icon="REFRESH" onAction="#refresh" />
+    </items>
+</ToolBar>

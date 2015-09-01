@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.erwandano.fxcomponents.control.SplitTab?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.VBox?>
+<SplitTab xmlns:fx="http://javafx.com/fxml" fx:id="bookmarksTab"
+        text="Bookmarks" fx:controller="com.erwandano.hexviewer.viewer.diffviewer.bookmarkstab.BookmarksTabController">
+    <content>
+        <SplitPane>
+            <items>
+                <VBox>
+                    <Label text="Modified offsets"/>
+                    <ListView fx:id="modifiedOffsetsListView" />
+                </VBox>
+                <VBox>
+                    <Label text="Modified pages" />
+                    <ListView fx:id="modifiedPagesListView" />
+                </VBox>
+            </items>
+        </SplitPane>
+    </content>
+</SplitTab>

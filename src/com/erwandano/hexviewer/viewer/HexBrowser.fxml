@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.erwandano.fxcomponents.control.SplitTabPane?>
+<?import javafx.scene.layout.*?>
+<AnchorPane xmlns:fx="http://javafx.com/fxml" fx:id="node">
+    <VBox
+            AnchorPane.topAnchor="0"
+            AnchorPane.rightAnchor="0"
+            AnchorPane.leftAnchor="0"
+            AnchorPane.bottomAnchor="0">
+        <fx:include source="toolbar/Toolbar.fxml" fx:id="toolBar"/>
+        <SplitTabPane fx:id="splitTabPane" tabPaneMinHeight="25" side="BOTTOM">
+        </SplitTabPane>
+
+    </VBox>
+</AnchorPane>

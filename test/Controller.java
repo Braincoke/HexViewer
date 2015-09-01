@@ -1,9 +1,9 @@
+import com.erwandano.hexviewer.utils.HexDumpLine;
+import com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowser;
 import com.erwandano.hexviewer.viewer.dumpviewer.HexDumpBrowser;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.layout.AnchorPane;
-import com.erwandano.hexviewer.utils.HexDumpLine;
-import com.erwandano.hexviewer.viewer.diffviewer.HexDiffBrowser;
 
 import java.io.File;
 import java.net.URL;
@@ -18,6 +18,8 @@ public class Controller implements Initializable {
     private HexDumpBrowser dumpBrowser;
     @FXML
     private HexDiffBrowser diffBrowser;
+
+    private String resourcesPath = "F:\\Projets\\DCU\\Practicum\\IntellijProjects\\HexViewer\\test-resources\\tested\\";
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -34,9 +36,8 @@ public class Controller implements Initializable {
     public void loadDump(){
         String file1 = "File1.txt";
         File file = new File(file1);
-
         dumpBrowser.loadFile(file, 0);
-        diffBrowser.setVisible(false);
+       // diffBrowser.setVisible(false);
     }
 
     public void loadDiff(){
@@ -44,7 +45,7 @@ public class Controller implements Initializable {
         String bigPdfCom = "compared.pdf";
 
         /* Hex Diff Testing */
-        String resourcesPath = "test-resources/";
+        //String resourcesPath = "test-resources/";
         String inserted = "inserted.pdf";
         String inserted1 = "inserted1.pdf";
         String inserted2 = "inserted2.pdf";
@@ -56,13 +57,13 @@ public class Controller implements Initializable {
         String modified2 = "todo/modified2.pdf";
         String modified3 = "todo/modified3.pdf";
 
-        String referencePath = resourcesPath + "todo/reference3.pdf";
-        String comparedPath = resourcesPath + modified3;
+        String referencePath = resourcesPath + "reference.pdf";
+        String comparedPath = resourcesPath + "compared1.pdf";
         File reference = new File(referencePath);
         File compared = new File(comparedPath);
         assert(reference.exists());
-        diffBrowser.loadDiff(reference,compared,0);
-        dumpBrowser.setVisible(false);
+        diffBrowser.loadDiff(reference, compared, 0);
+        //dumpBrowser.setVisible(false);
     }
 
 }
